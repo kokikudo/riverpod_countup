@@ -1,8 +1,6 @@
-import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:riverpod_countup/data/count_data.dart';
 import 'package:riverpod_countup/view_model.dart';
 import 'provider.dart';
 
@@ -52,7 +50,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     debugPrint('MyHomePage rebuild');
-    final countData = ref.watch(countDataProvider.state);
+    final countData = ref.watch(countDataProvider);
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -67,33 +65,19 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
               ref.watch(messageProvider),
             ),
             Text(
-              _viewModel.count,
+              countData.count.toString(),
               style: Theme.of(context).textTheme.headline4,
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 FloatingActionButton(
-                  onPressed: () {
-                    countData.update(
-                      (state) => state.copyWith(
-                        count: state.count + 1,
-                        countUp: state.countUp + 1,
-                      ),
-                    );
-                  },
+                  onPressed: () => _viewModel.onIncrease(),
                   tooltip: 'plus',
                   child: const Icon(CupertinoIcons.plus),
                 ),
                 FloatingActionButton(
-                  onPressed: () {
-                    countData.update(
-                      (state) => state.copyWith(
-                        count: state.count - 1,
-                        countDown: state.countDown + 1,
-                      ),
-                    );
-                  },
+                  onPressed: () => _viewModel.onDecrease(),
                   tooltip: 'minus',
                   child: const Icon(CupertinoIcons.minus),
                 ),
@@ -110,9 +94,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          countData.update((state) => CountData());
-        },
+        onPressed: () => _viewModel.onReset(),
         tooltip: 'refresh',
         child: const Icon(Icons.refresh),
       ),

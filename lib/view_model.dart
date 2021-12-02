@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_countup/data/count_data.dart';
 import 'package:riverpod_countup/logic/logic.dart';
 import 'package:riverpod_countup/logic/sound_logic.dart';
 
@@ -18,14 +19,6 @@ class ViewModel {
   }
 
   get count => ref.watch(countDataProvider).count.toString();
-  // get countUp => ref.watch(countDataProvider.select((value) {
-  //       debugPrint('countUpが再描画されたよ');
-  //       return value.countUp;
-  //     })).toString();
-  // get countDown => ref.watch(countDataProvider.select((value) {
-  //       debugPrint('countDownが再描画されたよ');
-  //       return value.countDown;
-  //     })).toString();
 
   get countUp =>
       ref.watch(countDataProvider.select((value) => value.countUp)).toString();
@@ -36,19 +29,24 @@ class ViewModel {
 
   void onIncrease() {
     _logic.increase();
-    ref.watch(countDataProvider.state).update((state) => _logic.countData);
-    _soundLogic.playUpSound();
+    updateCountData();
   }
 
   void onDecrease() {
     _logic.decrease();
-    ref.watch(countDataProvider.state).update((state) => _logic.countData);
-    _soundLogic.playDownSound();
+    updateCountData();
   }
 
   void onReset() {
     _logic.reset();
+    updateCountData();
+  }
+
+  void updateCountData() {
+    CountData oldCountData = ref.watch(countDataProvider);
     ref.watch(countDataProvider.state).update((state) => _logic.countData);
-    _soundLogic.playResetSound();
+    CountData newCountData = ref.watch(countDataProvider);
+
+    _soundLogic.valueChanges(oldCountData, newCountData);
   }
 }
